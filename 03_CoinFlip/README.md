@@ -1,4 +1,4 @@
-# 18_CoinFlip Project
+# 03_CoinFlip Project
 
 一、挑戰攻破 Ethernaut CTF 第 3 題： CoinFlip
 

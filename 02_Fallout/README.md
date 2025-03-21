@@ -1,4 +1,4 @@
-# 17_Fallout Project
+# 02_Fallout Project
 
 一、挑戰攻破 Ethernaut CTF 第2題： Fallout
 

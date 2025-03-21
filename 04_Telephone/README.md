@@ -1,18 +1,18 @@
 # 04_Telephone Project
 
-一、挑戰攻破 Ethernaut CTF 第 4 題： Telephone
+### 一、挑戰攻破 Ethernaut CTF 第 4 題： Telephone
 
  - 勝利條件：取得合約所有權
  - 知識儲備：Solidity 全域變數、Solidity 的介面與強制轉型與調用外部合約函數的技巧
 
-二、解題思路：
+### 二、解題思路：
 
 1. 理解 ```tx.origin``` 與 ```msg.sender``` 的差異。準備一個合約來與此合約互動
 2. 撰寫 TelephoneCaller 合約，來調用 Telephone changeOwner()
 
-三、Solidity 常見全域變數簡介：
+### 三、Solidity 常見全域變數簡介：
 
-區塊和交易屬性：
+#### 區塊和交易屬性：
 - blockhash(uint blockNumber) returns (bytes32): 指定區塊的雜湊值，僅適用於 256 個最新的區塊，不包括當前區塊。如果請求的區塊號碼超出這個範圍，則返回 0。
 - block.chainid returns (uint): 當前鏈的 ID。
 - block.coinbase returns (address payable): 當前區塊礦工的地址。
@@ -28,11 +28,11 @@
 - tx.gasprice returns (uint): 交易的 gas 價格。
 - tx.origin returns (address payable): 交易的原始發送者地址（完整呼叫鏈的起點）。
 
-合約相關：
+#### 合約相關：
  - this returns (address): 當前合約的地址。
  - selfdestruct(address payable recipient): 銷毀當前合約，並將剩餘的以太幣發送到指定的地址。
 
-數學和密碼學函數：
+#### 數學和密碼學函數：
 - abi.decode(bytes memory encodedData, (...)) returns (...): 解碼 ABI 編碼的資料。
 - abi.encode(...) returns (bytes): ABI 編碼給定的參數。
 - abi.encodePacked(...) returns (bytes): 對給定的參數執行緊密打包編碼。
@@ -47,7 +47,7 @@
 - sha256(bytes memory) returns (bytes32): 計算輸入的 SHA-256 雜湊值。
 - ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address): 從橢圓曲線簽名中恢復與公鑰相關的地址。
 
-其他：
+#### 其他：
 - assert(bool condition): 如果條件為 false，則中止執行並回退狀態變更。用於檢查內部錯誤。
 - require(bool condition, string memory message): 如果條件為 false，則中止執行並回退狀態變更。用於檢查輸入或外部元件中的錯誤。
 - revert(string memory message): 中止執行並回退狀態變更，並提供錯誤訊息。

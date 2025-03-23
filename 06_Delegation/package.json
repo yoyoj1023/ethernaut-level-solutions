@@ -1,0 +1,13 @@
+{
+  "name": "hardhat-project",
+  "type": "module",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.19"
+  },
+  "dependencies": {
+    "@ethersproject/keccak256": "^5.8.0",
+    "@ethersproject/strings": "^5.8.0",
+    "dotenv": "^16.4.7"
+  }
+}

@@ -17,7 +17,7 @@
 
 5. 值得注意的是 getStorage() 舊稱為 getStorageAt() 現已被移除
 
-6. ether.js 更多的函數使用說明，可參考 ether.js 官方 [github庫](https://github.com/ethers-io/ethers.js/blob/main/src.ts/providers/provider.ts) 
+6. ethers.js 更多的函數使用說明，可參考 ethers.js 官方 [github庫](https://github.com/ethers-io/ethers.js/blob/main/src.ts/providers/provider.ts) 
 
 ### 三、Solidity 補充：
 

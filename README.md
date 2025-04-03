@@ -16,26 +16,26 @@
 
 以下是目前已完成的關卡及其簡要說明：
 
-1. **00_HelloEthernaut**：介紹 Ethernaut 平台的基本操作。
-2. **01_Fallback**：學習 Fallback 函數的特性，並奪取合約所有權。
-3. **02_Fallout**：理解建構子的命名規則，並成為合約的所有者。
-4. **03_CoinFlip**：利用區塊哈希值預測硬幣結果，連續猜中 10 次。
-5. **04_Telephone**：利用 `tx.origin` 與 `msg.sender` 的差異奪取所有權。
-6. **05_Token**：觸發下溢漏洞，增加自己的代幣餘額。
-7. **06_Delegation**：利用 `delegatecall` 攻擊，奪取合約所有權。
-8. **07_Force**：使用 `selfdestruct` 強制將 ETH 傳送到目標合約。
-9. **08_Vault**：透過存儲槽（storage slot）讀取私有變數，解鎖金庫。
-10. **09_King**：成為國王並阻止其他人奪取國王位置。
-11. **10_Reentrance**：發動重入攻擊，提領合約的所有資金。
-12. **11_Elevator**：利用外部合約覆寫邏輯，到達電梯頂樓。
-13. **12_Privacy**：透過存儲槽讀取敏感資料，解鎖隱私合約。
+0. **00_HelloEthernaut**：介紹 Ethernaut 平台的基本操作。
+1. **01_Fallback**：學習 Fallback 函數的特性，並奪取合約所有權。
+2. **02_Fallout**：理解建構子的命名規則，並成為合約的所有者。
+3. **03_CoinFlip**：利用區塊哈希值預測硬幣結果，連續猜中 10 次。
+4. **04_Telephone**：利用 `tx.origin` 與 `msg.sender` 的差異奪取所有權。
+5. **05_Token**：觸發下溢漏洞，增加自己的代幣餘額。
+6. **06_Delegation**：利用 `delegatecall` 攻擊，奪取合約所有權。
+7. **07_Force**：使用 `selfdestruct` 強制將 ETH 傳送到目標合約。
+8. **08_Vault**：透過存儲槽（storage slot）讀取私有變數，解鎖金庫。
+9. **09_King**：成為國王並阻止其他人奪取國王位置。
+10. **10_Reentrance**：發動重入攻擊，提領合約的所有資金。
+11. **11_Elevator**：利用外部合約覆寫邏輯，到達電梯頂樓。
+12. **12_Privacy**：透過存儲槽讀取敏感資料，解鎖隱私合約。
 
 ## 使用方式
 
 1. 安裝依賴：
-    ```bash
-    npm install
-    ```
+```bash
+npm install
+```
 
 2. 編譯合約：
     ```bash

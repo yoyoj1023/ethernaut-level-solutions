@@ -38,19 +38,19 @@ npm install
 ```
 
 2. 編譯合約：
-    ```bash
-    npx hardhat compile
-    ```
+ ```bash
+npx hardhat compile
+```
 
 3. 部屬合約：
-    ```bash
-    npx hardhat run scripts/deploy_<script_name>.js --network <network_name>
-    ```
+```bash
+npx hardhat run scripts/deploy_<script_name>.js --network <network_name>
+```
 
 4. 執行互動腳本：
-    ```bash
-    npx hardhat run scripts/<script_name>.js --network <network_name>
-    ```
+```bash
+npx hardhat run scripts/<script_name>.js --network <network_name>
+```
 
 ## 環境需求
 

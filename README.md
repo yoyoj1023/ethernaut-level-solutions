@@ -31,6 +31,8 @@
 12. **12_Privacy**：透過存儲槽讀取敏感資料，解鎖隱私合約。
 13. **13_GatekeeperOne**：跨越3個障礙，需精算```gasleft()```與熟悉資料型別轉換。
 14. **14_GatekeeperTwo**：跨越3個障礙，需理解```extcodesize(caller())```性質，以及熟悉XOR運算子。
+15. **15-naught-coin**：理解 ERC20 的 `approve()` 與 `transferFrom()` 將代幣轉移出去。
+16. **16-preservation**：利用 `delegatecall` 覆寫 Library 的參考地址。
 
 ## 使用方式
 

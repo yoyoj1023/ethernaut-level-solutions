@@ -33,6 +33,7 @@
 14. **14_GatekeeperTwo**：跨越3個障礙，需理解```extcodesize(caller())```性質，以及熟悉XOR運算子。
 15. **15-naught-coin**：理解 ERC20 的 `approve()` 與 `transferFrom()` 將代幣轉移出去。
 16. **16-preservation**：利用 `delegatecall` 覆寫 Library 的參考地址。
+17. **17-recovery**：從合約生成工廠的合約中，找出被部屬的合約地址。
 
 ## 使用方式
 

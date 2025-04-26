@@ -34,6 +34,7 @@
 15. **15-naught-coin**：理解 ERC20 的 `approve()` 與 `transferFrom()` 將代幣轉移出去。
 16. **16-preservation**：利用 `delegatecall` 覆寫 Library 的參考地址。
 17. **17-recovery**：從合約生成工廠的合約中，找出被部屬的合約地址。
+18. **18-magic-number**：使用原始的底層 EVM opcodes 來創建微型合約。
 
 ## 使用方式
 

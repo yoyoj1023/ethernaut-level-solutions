@@ -35,6 +35,7 @@
 16. **16-preservation**：利用 `delegatecall` 覆寫 Library 的參考地址。
 17. **17-recovery**：從合約生成工廠的合約中，找出被部屬的合約地址。
 18. **18-magic-number**：使用原始的底層 EVM opcodes 來創建微型合約。
+19. **19-alien-codex**：利用動態陣列溢出和存儲槽(storage slot)佈局，覆蓋合約的所有者變數。
 
 ## 使用方式
 

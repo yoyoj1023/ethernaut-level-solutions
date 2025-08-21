@@ -1,19 +1,19 @@
-# 10_Reentracnce Project
+# 10_Reentrance Project
 
-### 一、挑戰攻破 Ethernaut CTF 第 10 題： Reentracnce
+## Challenge: Ethernaut CTF Level 10 - Reentrance
 
-- 勝利條件：提領合約的所有代幣
-- 知識儲備：重入攻擊、Fallback、合約函數的單執行序的執行方式
+- **Victory condition**: Withdraw all tokens from the contract
+- **Knowledge required**: Reentrancy attacks, Fallback, single-threaded execution of contract functions
 
-### 二、解題思路：
+## Solution Strategy:
 
-1. 透過一個外部合約呼叫 donate() 更新狀態。
+1. Use an external contract to call donate() to update state.
 
-2. 在外部合約的 receive() 內，再次呼叫 withdraw() 觸發重入攻擊
+2. In the external contract's receive() function, call withdraw() again to trigger a reentrancy attack
 
-3. 在外部合約呼叫 withdraw() 觸發提領，並且在 Reentracnce 更新餘額狀態之前，由於觸發了外部合約的 receive() 內，再次呼叫 withdraw() 觸發重入攻擊，再次提領
+3. When the external contract calls withdraw() to trigger withdrawal, before Reentrance updates the balance state, the external contract's receive() function is triggered, calling withdraw() again to trigger a reentrancy attack and withdraw again
 
-### 三、重入攻擊防護：
+## Reentrancy Attack Protection:
 
 ```solidity
 function withdraw(uint256 _amount) public {
@@ -27,7 +27,7 @@ function withdraw(uint256 _amount) public {
 }
 ```
 
-#### 1. 先變更狀態再執行提款邏輯：
+### 1. Change state before executing withdrawal logic:
 
 ```solidity
 function withdraw(uint256 _amount) public {
@@ -41,13 +41,13 @@ function withdraw(uint256 _amount) public {
 }
 ```
 
-#### 2. 重入防護鎖：
+### 2. Reentrancy protection lock:
 
 ```solidity
 bool private  _locked = false;
 
 function withdraw(uint256 _amount) public {
-    require(_locked == false, unicode"偵測到重入攻擊");
+    require(_locked == false, "Reentrancy attack detected");
     _locked = true;
     if (balances[msg.sender] >= _amount) {
         balances[msg.sender] -= _amount;
@@ -60,6 +60,6 @@ function withdraw(uint256 _amount) public {
 }
 ```
 
-#### 3. 使用 OpenZeppelin 的 ReentrancyGuard 庫：
+### 3. Use OpenZeppelin's ReentrancyGuard library:
 
 https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol

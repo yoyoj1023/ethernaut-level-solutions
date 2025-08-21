@@ -1,19 +1,18 @@
 # 07_Force Project
 
-一、挑戰攻破 Ethernaut CTF 第 7 題： Force
+## Challenge: Ethernaut CTF Level 7 - Force
 
-- 勝利條件：使合約的餘額大於 0
-- 知識儲備：Fallback、selfdestruct()、payable
+- **Victory condition**: Make the contract balance greater than 0
+- **Knowledge required**: Fallback, selfdestruct(), payable
 
-二、解題思路：
+## Solution Strategy:
 
-1. 透過自毀函數 selfdestruct() 強制將錢傳送到指定目標合約地址，即便目標合約沒有定義 receive()
+1. Use the self-destruct function selfdestruct() to forcibly send money to the specified target contract address, even if the target contract does not define receive()
 
+## Solidity Supplement:
 
-三、Solidity 補充：
+- Currently selfdestruct() has been deprecated. It is not recommended for use in new contract deployments.
 
-- 目前 selfdestrcut() 已被棄用。不建議在新合約部屬中使用。
+- After the Cancun upgrade, the underlying bytecode no longer deletes code and data associated with accounts. It only transfers its ether to the beneficiary.
 
-- 在坎昆升級後，底層機器碼已不再刪除與帳戶相關的代碼和數據。僅將其以太幣轉移給受益人。
-
-- 更多延伸說明請參見 EIP-6780
+- For more detailed explanations, please refer to EIP-6780

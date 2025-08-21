@@ -1,16 +1,16 @@
 # 06_Delegation Project
 
-一、挑戰攻破 Ethernaut CTF 第 6 題： Delegate
+## Challenge: Ethernaut CTF Level 6 - Delegate
 
-- 勝利條件：取得合約實例的所有權
-- 知識儲備：函數選擇器、delegatecall()與合約狀態、全域變數(msg.date)、 keccak256(toUtf8Bytes(sig))、交易的結構
+- **Victory condition**: Gain ownership of the contract instance
+- **Knowledge required**: Function selectors, delegatecall() and contract state, global variables (msg.data), keccak256(toUtf8Bytes(sig)), transaction structure
 
-二、解題思路：
+## Solution Strategy:
 
-1. 算出 pwn() 的函數選擇器的值(函數簽名的 Keccak-256 的前四個位元組)
+1. Calculate the function selector value of pwn() (first four bytes of the Keccak-256 hash of the function signature)
 
-2. 當 EVM 收到一個函數調用時，它會使用函數選擇器來查找要執行的函數
+2. When the EVM receives a function call, it uses the function selector to find the function to execute
 
-三、Solidity 補充：
+## Solidity Supplement:
 
-- ``` .delegatecall() ``` 是非常危險的函數，它會呼叫外部函數的執行內容，但卻是改變本合約的狀態。
+- `.delegatecall()` is a very dangerous function that calls the execution content of external functions but changes the state of the current contract.

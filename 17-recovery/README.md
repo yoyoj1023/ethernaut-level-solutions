@@ -1,31 +1,31 @@
 # Ethernaut #19 - Recovery
 
-這是 Ethernaut 遊戲中的第 19 關「Recovery」挑戰的解決方案。
+This is the solution for the "Recovery" challenge, Level 19 in the Ethernaut game.
 
-## 關卡說明
+## Challenge Description
 
-在這個關卡中，我們需要恢復一個丟失的合約地址。有人使用 `Recovery` 合約創建了一個 `SimpleToken` 代幣，並向其中發送了一些以太幣，但是不記得合約的地址了。我們需要找回這個合約並取回其中的資金。
+In this level, we need to recover a lost contract address. Someone used the `Recovery` contract to create a `SimpleToken` token and sent some ether to it, but forgot the contract address. We need to find this contract and recover the funds from it.
 
-## 攻略要點
+## Strategy Points
 
-### 問題核心
-1. 找到丟失的 `SimpleToken` 合約地址
-2. 利用合約中的 `destroy` 函數將資金取回
+### Core Problem
+1. Find the lost `SimpleToken` contract address
+2. Use the `destroy` function in the contract to recover the funds
 
-### 解題思路
+### Solution Approach
 
-#### 1. 尋找合約地址
-以太坊上的合約地址是確定性的，由創建者地址和 nonce 計算得出。當一個合約創建另一個合約時，新合約的地址是由創建合約的地址和其 nonce 決定的。
+#### 1. Finding the Contract Address
+Contract addresses on Ethereum are deterministic, calculated from the creator address and nonce. When a contract creates another contract, the new contract's address is determined by the creating contract's address and its nonce.
 
-計算合約地址的公式：
+Contract address calculation formula:
 ```
 address = rightmost_20_bytes(keccak256(RLP(creator_address, creator_nonce)))
 ```
 
-對於 `SimpleToken` 合約，它是由 `Recovery` 合約通過 `generateToken` 函數創建的，因此可以根據 `Recovery` 合約地址和 nonce 計算出 `SimpleToken` 的地址。
+For the `SimpleToken` contract, it was created by the `Recovery` contract through the `generateToken` function, so we can calculate the `SimpleToken` address based on the `Recovery` contract address and nonce.
 
-#### 2. 執行 destroy 函數
-一旦找到了 `SimpleToken` 的地址，可以調用其 `destroy` 函數，該函數使用 `selfdestruct` 將合約內的所有資金發送到指定地址。
+#### 2. Execute destroy Function
+Once the `SimpleToken` address is found, we can call its `destroy` function, which uses `selfdestruct` to send all funds in the contract to a specified address.
 
 ```solidity
 function destroy(address payable _to) public {
@@ -33,17 +33,17 @@ function destroy(address payable _to) public {
 }
 ```
 
-### 實現步驟
-1. 使用 `scripts/interact.ts` 腳本，提供正確的 `SimpleToken` 地址
-2. 調用 `destroy` 函數將資金轉移到我們的地址
-3. 驗證 `SimpleToken` 合約餘額為 0，表示攻擊成功
+### Implementation Steps
+1. Use the `scripts/interact.ts` script, providing the correct `SimpleToken` address
+2. Call the `destroy` function to transfer funds to our address
+3. Verify that the `SimpleToken` contract balance is 0, indicating successful attack
 
-## 學習心得
-1. 合約地址是確定性的，可以通過創建者地址和 nonce 計算得出
-2. `selfdestruct` 操作會銷毀合約並將資金發送至指定地址
-3. 即使忘記了合約地址，只要知道創建合約的交易，仍然可以找回合約
+## Learning Insights
+1. Contract addresses are deterministic and can be calculated from creator address and nonce
+2. `selfdestruct` operation destroys the contract and sends funds to a specified address
+3. Even if the contract address is forgotten, the contract can still be found as long as the creation transaction is known
 
-## 預防措施
-1. 不要依賴 `selfdestruct` 作為合約中的功能，除非確實需要
-2. 為關鍵操作添加適當的權限控制
-3. 妥善保管合約地址和相關信息，避免丟失
+## Prevention Measures
+1. Don't rely on `selfdestruct` as a feature in contracts unless absolutely necessary
+2. Add appropriate access controls for critical operations
+3. Properly manage contract addresses and related information to avoid loss

@@ -1,26 +1,26 @@
 # 11_Elevator Project
 
-### 一、挑戰攻破 Ethernaut CTF 第 11 題： Elevator
+## Challenge: Ethernaut CTF Level 11 - Elevator
 
-- 勝利條件：到達電梯頂樓
-- 知識儲備：gas精算、gasleft()、view、變更合約狀態
+- **Victory condition**: Reach the top floor of the elevator
+- **Knowledge required**: Gas calculation, gasleft(), view, changing contract state
 
-### 二、解題思路：
+## Solution Strategy:
 
-1. 透過一個外部合約覆寫 isLastFloor(uint256 _floor) 
+1. Use an external contract to override isLastFloor(uint256 _floor)
 
-2. 根據電梯的在 goTo() 內呼叫 isLastFloor() 次數變更外部合約狀態，使得每次呼叫回傳的 bool 值不同。
+2. Change the external contract state based on the number of times isLastFloor() is called within the elevator's goTo() function, making each call return a different bool value.
 
-3. 另一種作法是，透過 gasleft() 精算剩餘的 gas 達到條件時，觸發回傳不同的 bool 值。
+3. Another approach is to use gasleft() to precisely calculate the remaining gas and trigger different bool return values when conditions are met.
 
-### 三、Solidity：
+## Solidity:
 
 ```solidity
-// 不要相信呼叫外部合約函數的結果是 1-1 且 onto 的
+// Don't trust that calling external contract functions results in 1-1 and onto mappings
     if (!building.isLastFloor(_floor)) {
         floor = _floor;
         top = building.isLastFloor(floor);
     }
 ```
 
-1. 不要相信呼叫外部合約函數的結果是 1-1 且 onto 的
+1. Don't trust that calling external contract functions results in 1-1 and onto mappings

@@ -1,23 +1,22 @@
 # 05_Token Project
 
-一、挑戰攻破 Ethernaut CTF 第 5 題： Token
+## Challenge: Ethernaut CTF Level 5 - Token
 
-- 勝利條件：將初始取得的代幣數量，透過漏洞變多
-- 知識儲備：溢位、odometer。
+- **Victory condition**: Increase the initial token amount obtained through vulnerabilities
+- **Knowledge required**: Overflow, odometer.
 
-二、解題思路：
+## Solution Strategy:
 
-1. 發送高於自己的初始代幣到其他地址，觸發我的 balance 下溢
+1. Send more tokens than your initial amount to another address, triggering an underflow in my balance
 
+## Solidity Supplement:
 
-三、Solidity 補充：
+- After Solidity 0.8.0, when declaring constructors, you don't need to use the `public` keyword.
 
-- 在 Solidity 0.8.0 之後，宣告建構子時，不需要使用 ```public``` 關鍵字。
+---
 
-#
+- Before Solidity 0.8.0, handling overflow issues required great care. For example, a `uint8` variable that exceeds the maximum value of 255 would overflow starting from 256 and wrap back to 0 (wrapping back to minimum). Underflow would wrap back to the maximum value.
 
-- 在 Solidity 0.8.0 之前，處理溢位問題需要非常小心，假設一個 ```uint8``` 的變數在超過最大值 255 時，從 256 開始就會溢位變成 0 (繞回到最小時)。下溢時會繞回到最大值。
+- Before Solidity 0.8.0, arithmetic operations that caused overflow or underflow would not throw errors. It was recommended to use OpenZeppelin's SafeMath library.
 
-- 在 Solidity 0.8.0 之前，算術運算發生溢位或下溢時，不會拋出錯誤。建議採用OpenZeppelin 的 SafeMath 庫。 
-
-- 在 Solidity 0.8.0 之後，預設情況下，算術運算發生溢位或下溢時，會自動拋出錯誤。這意味著你不再需要手動使用 SafeMath 庫來防止溢位和下溢。如果發生溢位或下溢，交易會被回滾，並且會拋出一個異常。
+- After Solidity 0.8.0, by default, arithmetic operations that cause overflow or underflow will automatically throw errors. This means you no longer need to manually use the SafeMath library to prevent overflow and underflow. If overflow or underflow occurs, the transaction will be reverted and an exception will be thrown.

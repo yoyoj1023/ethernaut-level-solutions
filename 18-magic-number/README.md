@@ -1,19 +1,19 @@
-# Ethernaut Challenge - Magic Number 解題攻略
+# Ethernaut Challenge - Magic Number Solution Guide
 
-## 關卡目標
+## Challenge Objective
 
-這個關卡要求我們創建一個微型合約（Solver），當呼叫 `whatIsTheMeaningOfLife()` 函數時返回數字 42，並且合約大小不超過 10 個操作碼（opcodes）。
+This challenge requires us to create a tiny contract (Solver) that returns the number 42 when calling the `whatIsTheMeaningOfLife()` function, and the contract size must not exceed 10 opcodes.
 
-## 解題關鍵
+## Key Solution Points
 
-1. **理解底層 EVM 運作**: 這個挑戰要求我們深入理解 EVM（以太坊虛擬機）的底層運作原理，必須使用原始的 EVM 字節碼來創建合約，而不是使用 Solidity 或其他高階語言。
-2. **合約創建字節碼**: 我們需要了解合約創建過程中的兩個主要部分：
-   - 初始化代碼：用於合約部署期間執行
-   - 運行時代碼：實際存儲在區塊鏈上並響應函數調用的代碼
+1. **Understanding Low-Level EVM Operations**: This challenge requires us to deeply understand the low-level operating principles of the EVM (Ethereum Virtual Machine), and we must use raw EVM bytecode to create contracts rather than using Solidity or other high-level languages.
+2. **Contract Creation Bytecode**: We need to understand the two main parts of the contract creation process:
+   - Initialization code: Used for execution during contract deployment
+   - Runtime code: Actually stored on the blockchain and responds to function calls
 
-## 攻略步驟
+## Solution Steps
 
-### 1. 分析 MagicNum 合約
+### 1. Analyze the MagicNum Contract
 
 ```solidity
 contract MagicNum {
@@ -25,48 +25,48 @@ contract MagicNum {
 }
 ```
 
-這個合約只有一個功能：儲存 solver 合約的地址。我們需要創建一個能返回 42 的微型合約，並將其地址設置為 solver。
+This contract has only one function: storing the solver contract address. We need to create a tiny contract that can return 42 and set its address as the solver.
 
-### 2. 撰寫運行時字節碼
+### 2. Write Runtime Bytecode
 
-運行時代碼需要完成的操作：
-- 將值 42（十六進制 0x2a）放入堆疊
-- 將該值存入記憶體
-- 返回記憶體中的值
+Operations the runtime code needs to complete:
+- Put the value 42 (hexadecimal 0x2a) on the stack
+- Store this value in memory
+- Return the value from memory
 
-對應的操作碼（opcode）：
+Corresponding opcodes:
 ```
-PUSH1 0x2a  // 將 42 壓入堆疊
-PUSH1 0x00  // 將 0 壓入堆疊
-MSTORE      // 將 42 存入記憶體位置 0
-PUSH1 0x20  // 將 32（十六進制 0x20）壓入堆疊（32 位元組的數據長度）
-PUSH1 0x00  // 將 0 壓入堆疊（記憶體起始位置）
-RETURN      // 返回從位置 0 開始的 32 位元組數據
-```
-
-轉換為字節碼：`602a60005260206000f3`（總共 10 位元組，正好符合要求）
-
-### 3. 撰寫初始化字節碼
-
-初始化代碼需要執行以下操作：
-- 將運行時代碼複製到記憶體
-- 返回運行時代碼給 EVM
-
-對應的操作碼：
-```
-PUSH10 0x602a60005260206000f3  // 將運行時代碼壓入堆疊
-PUSH1 0x00                     // 將 0 壓入堆疊
-MSTORE                         // 將運行時代碼存入記憶體位置 0
-PUSH1 0x0a                     // 將 10 壓入堆疊（運行時代碼的長度）
-PUSH1 0x16                     // 將 22 壓入堆疊（運行時代碼在記憶體中的起始位置）
-RETURN                         // 返回運行時代碼
+PUSH1 0x2a  // Push 42 onto the stack
+PUSH1 0x00  // Push 0 onto the stack
+MSTORE      // Store 42 at memory position 0
+PUSH1 0x20  // Push 32 (hexadecimal 0x20) onto the stack (32-byte data length)
+PUSH1 0x00  // Push 0 onto the stack (memory start position)
+RETURN      // Return 32 bytes of data starting from position 0
 ```
 
-完整的部署字節碼：`69602a60005260206000f3600052600a6016f3`
+Converted to bytecode: `602a60005260206000f3` (total 10 bytes, exactly meeting the requirement)
 
-### 4. 部署合約
+### 3. Write Initialization Bytecode
 
-使用 Web3.js 部署合約：
+The initialization code needs to perform the following operations:
+- Copy the runtime code to memory
+- Return the runtime code to the EVM
+
+Corresponding opcodes:
+```
+PUSH10 0x602a60005260206000f3  // Push runtime code onto the stack
+PUSH1 0x00                     // Push 0 onto the stack
+MSTORE                         // Store runtime code at memory position 0
+PUSH1 0x0a                     // Push 10 onto the stack (length of runtime code)
+PUSH1 0x16                     // Push 22 onto the stack (start position of runtime code in memory)
+RETURN                         // Return runtime code
+```
+
+Complete deployment bytecode: `69602a60005260206000f3600052600a6016f3`
+
+### 4. Deploy Contract
+
+Deploy contract using Web3.js:
 
 ```javascript
 const tx = await web3.eth.sendTransaction({
@@ -77,15 +77,15 @@ const tx = await web3.eth.sendTransaction({
 const solverAddress = tx.contractAddress;
 ```
 
-### 5. 設置 Solver
+### 5. Set Solver
 
 ```javascript
 await contract.setSolver(solverAddress);
 ```
 
-## 解題心得
+## Solution Insights
 
-這個挑戰讓我深入了解了 EVM 的底層運作機制，特別是合約的部署過程和操作碼如何轉換為字節碼。這種理解對於優化智能合約或者進行安全審計時非常有用。在 Web3 開發中，即使大多數時候我們使用高級語言如 Solidity，但理解底層原理有助於編寫更高效、更安全的代碼。
+This challenge gave me a deep understanding of the EVM's low-level operating mechanisms, particularly the contract deployment process and how opcodes are converted to bytecode. This understanding is very useful for optimizing smart contracts or conducting security audits. In Web3 development, even though we mostly use high-level languages like Solidity, understanding the underlying principles helps write more efficient and secure code.
 
 ## 參考資源
 

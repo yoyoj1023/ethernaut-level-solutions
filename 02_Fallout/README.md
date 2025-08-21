@@ -1,15 +1,15 @@
 # 02_Fallout Project
 
-一、挑戰攻破 Ethernaut CTF 第2題： Fallout
+## Challenge: Ethernaut CTF Level 2 - Fallout
 
- - 勝利條件：成為合約所有者
- - 知識儲備：建構子
+ - **Victory condition**: Become the contract owner
+ - **Knowledge required**: Constructor
 
-二、解題思路：
+## Solution Strategy:
 
-1. 眼睛放大看清楚，直接呼叫 ```Fal1out()``` 就變成 owner 了
+1. Look closely, directly calling `Fal1out()` will make you the owner
 
-三、Solidity語法補充：關於 `view`
+## Solidity Syntax Supplement: About `view`
 
 ```solidity
 function allocatorBalance(address allocator) public view returns (uint256) {
@@ -17,20 +17,20 @@ function allocatorBalance(address allocator) public view returns (uint256) {
     }
 ```
 
- `view` 用於聲明一個函數不會修改合約的狀態變量，也不能發出事件，僅能是只讀函數。
+`view` is used to declare that a function will not modify the contract's state variables and cannot emit events - it can only be a read-only function.
 
- 用途：
+### Usage:
 
- 1. 不修改狀態： view 函數保證不會更改合約的任何狀態變量。這對於讀取合約數據而不影響其狀態非常重要。
+1. **No State Modification**: `view` functions guarantee they will not change any state variables of the contract. This is very important for reading contract data without affecting its state.
 
- 2. Gas 消耗： 調用 view 函數通常不消耗 gas，除非它們是從另一個需要消耗 gas 的合約函數調用的。這是因為它們可以在本地節點上執行，而無需在區塊鏈上執行交易。
+2. **Gas Consumption**: Calling `view` functions typically does not consume gas, unless they are called from another contract function that requires gas consumption. This is because they can be executed on local nodes without needing to execute transactions on the blockchain.
 
- 3. 宣告方式： 你可以在函數聲明中使用 view 關鍵字，例如：function getData() public view returns (uint) { ... }。
+3. **Declaration Method**: You can use the `view` keyword in function declarations, for example: `function getData() public view returns (uint) { ... }`.
 
- 4. 限制： view 函數不能調用任何非 `view` 或 `pure` 的函數，因為這些函數可能會修改狀態。
+4. **Restrictions**: `view` functions cannot call any non-`view` or `pure` functions, as those functions might modify state.
 
- 5. 使用場景： 常見的使用場景包括：
+5. **Use Cases**: Common use cases include:
 
-    - 讀取狀態變量的值。
-    - 執行計算並返回結果，而不更改合約狀態。
-    - 查詢合約的某些屬性。
+    - Reading state variable values.
+    - Performing calculations and returning results without changing contract state.
+    - Querying certain properties of the contract.

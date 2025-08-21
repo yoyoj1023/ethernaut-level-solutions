@@ -1,24 +1,24 @@
 # 00_HelloEthernaut Project
 
-一、挑戰 Solidity CTF（Capture The Flag）：
+## Challenge Solidity CTF (Capture The Flag):
 
 ```
-1.入門到中階：Ethernaut CTF
+1. Beginner to Intermediate: Ethernaut CTF
 https://ethernaut.openzeppelin.com/
 
-2.中階到進階：Capture the ether
+2. Intermediate to Advanced: Capture the Ether
 
-3.大師級別：Paradigm CTF/Secureum Bootcamp
+3. Master Level: Paradigm CTF/Secureum Bootcamp
 ```
 
-二、說明：
+## Instructions:
 ```
-1.建議選擇 L2 網路連結這個 Dapp，L1 sepolia 經常塞車
-2.這個是區塊鏈工程師版本的類 leetcode
-3.學習合約安全的基礎，攻破合約漏洞，並補上正確答案
-4.這是必備技能
+1. Recommend choosing L2 networks to connect to this Dapp, as L1 Sepolia often gets congested
+2. This is the blockchain engineer's version of LeetCode
+3. Learn the fundamentals of contract security, exploit contract vulnerabilities, and provide correct solutions
+4. This is an essential skill
 ```
 
-三、這個項目內的合約是正確答案
+## The contracts in this project are the correct solutions
 
 https://i.imgur.com/jV36aWC.png

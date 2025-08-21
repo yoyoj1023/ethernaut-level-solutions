@@ -1,111 +1,111 @@
-# Ethernaut DEX 挑戰
+# Ethernaut DEX Challenge
 
-這個專案是 [Ethernaut](https://ethernaut.openzeppelin.com/) 的 DEX 挑戰實現，展示了一個簡單的去中心化交易所 (DEX) 及其相關的安全漏洞。
+This project is an implementation of the DEX challenge from [Ethernaut](https://ethernaut.openzeppelin.com/), demonstrating a simple decentralized exchange (DEX) and its related security vulnerabilities.
 
-## 專案概述
+## Project Overview
 
-本專案包含兩個主要合約：
-- **Dex**: 一個簡單的 DEX 合約，允許兩種代幣之間的交換
-- **SwappableToken**: 可交換的 ERC20 代幣合約
+This project contains two main contracts:
+- **Dex**: A simple DEX contract that allows swapping between two tokens
+- **SwappableToken**: A swappable ERC20 token contract
 
-## 合約功能
+## Contract Features
 
-### Dex 合約
-- **setTokens**: 設定兩個可交換的代幣地址 (僅 owner)
-- **addLiquidity**: 添加流動性 (僅 owner)
-- **swap**: 在兩個代幣之間進行交換
-- **getSwapPrice**: 計算交換價格
-- **approve**: 批准代幣花費
-- **balanceOf**: 查詢代幣餘額
+### Dex Contract
+- **setTokens**: Set two swappable token addresses (owner only)
+- **addLiquidity**: Add liquidity (owner only)
+- **swap**: Swap between two tokens
+- **getSwapPrice**: Calculate swap price
+- **approve**: Approve token spending
+- **balanceOf**: Query token balance
 
-### SwappableToken 合約
-- 標準 ERC20 代幣實現
-- 與 DEX 合約整合
-- 包含特殊的 approve 邏輯
+### SwappableToken Contract
+- Standard ERC20 token implementation
+- Integrated with DEX contract
+- Contains special approve logic
 
-## 安全考量
+## Security Considerations
 
-⚠️ **警告**: 這個 DEX 實現包含已知的安全漏洞，僅用於教育目的。不應在生產環境中使用。
+⚠️ **Warning**: This DEX implementation contains known security vulnerabilities and is for educational purposes only. It should not be used in production environments.
 
-主要漏洞包括：
-1. 價格計算邏輯存在缺陷，可能導致價格操縱
-2. 流動性管理不當
-3. 缺乏滑點保護
+Main vulnerabilities include:
+1. Flawed price calculation logic that can lead to price manipulation
+2. Improper liquidity management
+3. Lack of slippage protection
 
-## 安裝與設置
+## Installation and Setup
 
 ```bash
-# 安裝依賴
+# Install dependencies
 npm install
 
-# 或使用 yarn
+# or use yarn
 yarn install
 ```
 
-## 使用方法
+## Usage
 
-### 編譯合約
+### Compile Contracts
 ```bash
 npx hardhat compile
 ```
 
-### 運行測試
+### Run Tests
 ```bash
 npx hardhat test
 ```
 
-### 運行本地節點
+### Run Local Node
 ```bash
 npx hardhat node
 ```
 
-### 部署合約
+### Deploy Contracts
 ```bash
 npx hardhat ignition deploy ./ignition/modules/Lock.ts
 ```
 
-## 挑戰目標
+## Challenge Objectives
 
-Ethernaut DEX 挑戰的目標通常是：
-1. 理解 DEX 的工作原理
-2. 發現價格計算中的漏洞
-3. 利用漏洞來操縱代幣價格
-4. 學習如何保護 DEX 免受此類攻擊
+The goals of the Ethernaut DEX challenge typically include:
+1. Understand how DEX works
+2. Discover vulnerabilities in price calculation
+3. Exploit vulnerabilities to manipulate token prices
+4. Learn how to protect DEX from such attacks
 
-## 技術棧
+## Technology Stack
 
-- **Solidity**: 智能合約開發語言
-- **Hardhat**: 以太坊開發框架
-- **OpenZeppelin**: 安全的智能合約庫
-- **TypeScript**: 腳本和測試語言
+- **Solidity**: Smart contract development language
+- **Hardhat**: Ethereum development framework
+- **OpenZeppelin**: Secure smart contract library
+- **TypeScript**: Scripting and testing language
 
-## 檔案結構
+## File Structure
 
 ```
 92-ethernaut-dex/
 ├── contracts/
-│   └── Dex.sol              # DEX 和代幣合約
-├── test/                    # 測試文件
-├── ignition/               # 部署腳本
-├── hardhat.config.ts       # Hardhat 配置
-└── package.json           # 項目依賴
+│   └── Dex.sol              # DEX and token contracts
+├── test/                    # Test files
+├── ignition/               # Deployment scripts
+├── hardhat.config.ts       # Hardhat configuration
+└── package.json           # Project dependencies
 ```
 
-## 學習資源
+## Learning Resources
 
-- [Ethernaut 官方網站](https://ethernaut.openzeppelin.com/)
-- [OpenZeppelin 文檔](https://docs.openzeppelin.com/)
-- [Hardhat 文檔](https://hardhat.org/docs)
-- [Solidity 文檔](https://docs.soliditylang.org/)
+- [Ethernaut Official Website](https://ethernaut.openzeppelin.com/)
+- [OpenZeppelin Documentation](https://docs.openzeppelin.com/)
+- [Hardhat Documentation](https://hardhat.org/docs)
+- [Solidity Documentation](https://docs.soliditylang.org/)
 
-## 貢獻
+## Contributing
 
-歡迎提交 issues 和 pull requests 來改進此專案。
+Feel free to submit issues and pull requests to improve this project.
 
-## 授權
+## License
 
-此專案基於 MIT 授權條款。
+This project is licensed under the MIT License.
 
 ---
 
-**免責聲明**: 此代碼僅供教育和學習目的。請勿在生產環境中使用，因為它包含已知的安全漏洞。
+**Disclaimer**: This code is for educational and learning purposes only. Do not use in production environments as it contains known security vulnerabilities.

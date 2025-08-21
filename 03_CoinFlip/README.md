@@ -1,20 +1,18 @@
 # 03_CoinFlip Project
 
-一、挑戰攻破 Ethernaut CTF 第 3 題： CoinFlip
+## Challenge: Ethernaut CTF Level 3 - CoinFlip
 
- - 勝利條件：連續猜中硬幣正反面 10 次，使得 ```consecutiveWins``` 的值為 10
- - 知識儲備：Solidity 全域變數、區塊哈希值、Chainlink VRF、Solidity 的介面與強制轉型與調用外部合約函數的技巧
+ - **Victory condition**: Guess the coin flip correctly 10 times in a row, making the value of `consecutiveWins` equal to 10
+ - **Knowledge required**: Solidity global variables, block hash values, Chainlink VRF, Solidity interfaces and type casting and techniques for calling external contract functions
 
+## Solution Strategy:
 
-二、解題思路：
+1. First deploy the CoinFlipExtensions contract to experience the values of `block.number` and `blockhash()`
+2. Design an attack contract that can call functions of the CoinFlip contract, because this will make the `block.number` and `blockhash()` values the same for both contracts (executed within the same block)
+3. In the attack contract, based on the result calculated from the block hash, predict heads or tails, and call CoinFlip's `flip()` with the result as a parameter
+4. In JavaScript, repeatedly call the attack contract to attack 10 times
 
-1. 先部屬 CoinFlipExtensions 合約，體驗一下 ```block.number``` 、 ```blockhash()``` 的值
-2. 構思一個攻擊合約，可以使攻擊合約調用 CoinFlip 合約的函數，因為這會使得兩份合約的 ```block.number``` 、 ```blockhash()``` 的值相同 (同一個區塊內執行)
-3. 在攻擊合約內，根據區塊哈希算出來的結果，猜測正反面，並將結果作為參數呼叫 CoinFlip 的 ```flip()```
-4. 在 javascript 上，重複呼叫攻擊合約，攻擊 10 次
-
-
-三、Solidity 技巧補充：關於在合約內部調用外部合約的方法
+## Solidity Technique Supplement: About calling external contracts from within contracts
 
 ```solidity
 contract CoinFlipAttacker {
@@ -38,6 +36,6 @@ interface ICoinFlip {
 }
 ```
 
-1. 撰寫介面，定義你要調用外部合約的函數
-2. 將你要調用的合約地址，強制轉型成該介面型別
-3. 呼叫該函數
+1. Write an interface defining the functions of the external contract you want to call
+2. Cast the contract address you want to call to that interface type
+3. Call the function

@@ -40,6 +40,9 @@ Below are the currently completed levels with brief descriptions:
 21. **21-shop**: Exploit external contract state changes to return different price values within the same transaction.
 22. **22-dex**: Drain tokens through price manipulation attacks, exploiting imbalances in decentralized exchange liquidity pools.
 23. **23-dex2**: Exploit DEX's lack of token whitelist verification by creating malicious tokens and manipulating price calculation formulas to extract all tokens from the liquidity pool.
+24. **24-puzzle-wallet**: Exploit storage collision vulnerabilities between proxy and implementation contracts, combined with multicall logic flaws to manipulate contract balance and claim admin privileges.
+
+
 
 ## Usage
 

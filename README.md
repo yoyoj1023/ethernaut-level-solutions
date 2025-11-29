@@ -41,6 +41,7 @@ Below are the currently completed levels with brief descriptions:
 22. **22-dex**: Drain tokens through price manipulation attacks, exploiting imbalances in decentralized exchange liquidity pools.
 23. **23-dex2**: Exploit DEX's lack of token whitelist verification by creating malicious tokens and manipulating price calculation formulas to extract all tokens from the liquidity pool.
 24. **24-puzzle-wallet**: Exploit storage collision vulnerabilities between proxy and implementation contracts, combined with multicall logic flaws to manipulate contract balance and claim admin privileges.
+25. **25-motorbike**: Exploit UUPS proxy contract vulnerabilities by directly initializing the logic contract, then upgrading to a malicious contract that executes `selfdestruct` to destroy the logic contract (Note: Due to EIP-6780, `selfdestruct` cannot permanently delete contract code after the Cancun hard fork).
 
 
 
